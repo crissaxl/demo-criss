@@ -1,50 +1,56 @@
 name: Playwright Tests
-on:
-  # push:
-  #   branches: [ main, master ]
-  # pull_request:
-  #   branches: [ main, master ]
-  workflow_dispatch:
 
-  env:
-    SFDX_HIDE_RELEASE_NOTES: true
-    SFDX_DATA_DIR: "/home/runner/sfdx-plugins"
-    SFDX_ORG_NAME: "SushilindroFinal"
+# Esto le dice a GitHub cuándo ejecutar las pruebas (al hacer push a la rama main)
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   test:
     timeout-minutes: 60
+    # El sistema operativo virtual donde correrán los tests
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    # 1. Descarga tu código en el servidor de GitHub
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    # 2. Instala Node.js
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
       with:
         node-version: lts/*
 
-    - name: Setup SF CLI
-      run: |
-        pwd
-        mkdir -p ${SFDX_DATA_DIR} && chmod 777 ${SFDX_DATA_DIR}
-        npm install @salesforce/cli -g
-        echo y | sfdx plugins:install sfdx-git-delta
-
-    - name: Authenticate into SF Org
-      run: |
-        echo "${{ secrets.SF_TRAKING01_URL }}" | sf org:login:sfdx-url -a ${SFDX_ORG_NAME} --sfdx-url-stdin -s
-        sf org:display -o ${SFDX_ORG_NAME}
-
-    - name: Install dependencies
+    # 3. Instala las dependencias de tu package.json
+    - name: Instalar dependencias
       run: npm ci
 
-    - name: Install Playwright Browsers
+    # 4. Instala los navegadores de Playwright (Chromium, Firefox, WebKit) y sus dependencias
+    - name: Instalar navegadores de Playwright
       run: npx playwright install --with-deps
 
-    - name: Run Playwright tests
+    # 5. Recreamos el archivo server.key de forma segura en el servidor virtual
+    - name: Configurar llave privada de Salesforce
+      run: |
+        mkdir -p certs
+        echo "${{ secrets.SERVER_KEY }}" > certs/server.key
+
+    # 6. Ejecutamos las pruebas con TUS variables de entorno
+    - name: Ejecutar pruebas de Playwright
       run: npx playwright test
-      
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
+      env:
+        CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+        CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+        LOGIN_URL: ${{ secrets.LOGIN_URL }}
+        USERNAME: ${{ secrets.USERNAME }}
+
+    # 7. Guarda el reporte visual por si alguna prueba falla
+    - name: Subir reporte de Playwright
+      uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: playwright-report
         path: playwright-report/
