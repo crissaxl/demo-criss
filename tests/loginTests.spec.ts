@@ -12,7 +12,7 @@ test.describe('Flujos de Salesforce', () => {
         // Para este momento de la prueba, ya estás dentro de Salesforce
 
         // Aquí puedes agregar aserciones visuales, por ejemplo:
-        await expect(page).toHaveTitle(/Home | Salesforce/i);
+        await expect(page.getByRole('button', { name: 'App Launcher' })).toBeVisible();
     });
 
 });
