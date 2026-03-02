@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 export class LoginPage {
     readonly page: Page;
@@ -16,6 +16,6 @@ export class LoginPage {
 
         await this.page.waitForLoadState('load');
 
-        await this.page.waitForURL('**/lightning/page/home', { timeout: 30000 });
+        await expect(this.page.getByRole('button', { name: 'App Launcher' })).toBeVisible();
     }
 }
