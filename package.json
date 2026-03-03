@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "wdio": "wdio run ./wdio.conf.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -11,7 +13,17 @@
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.3.3"
+    "@types/node": "^25.3.3",
+    "@wdio/appium-service": "^9.24.0",
+    "@wdio/cli": "^9.24.0",
+    "@wdio/globals": "^9.23.0",
+    "@wdio/local-runner": "^9.24.0",
+    "@wdio/mocha-framework": "^9.24.0",
+    "@wdio/spec-reporter": "^9.24.0",
+    "appium": "^3.2.0",
+    "appium-xcuitest-driver": "^10.24.2",
+    "expect-webdriverio": "^5.6.4",
+    "webdriverio": "^9.24.0"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
